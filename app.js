@@ -9,42 +9,48 @@ new Vue({
     methods: {
         // Функция, которая выполняется при действии пользователя во время игры
         action: function (actionType) {
-            let monsterPoint = this.randomNumber();
             let userPoint = this.randomNumber();
-            this.userScore -= monsterPoint;
 
             // Если пользователь атакует монстра, то и монстр атакует в ответ и эти действия добавляются в массив истории
             if (actionType == 'attack') {
                 this.monsterScore -= userPoint;
-                this.historyActions.unshift({
-                    userAction: `Player hit the monster for ${userPoint}`,
-                    monsterAction: `Monster hit the player for ${monsterPoint}`
-                });
+                this.addAction('Player hit the monster for ', userPoint, true);
+                this.monsterHit();
                 // Если пользователь атакует с большей силой монстра, то и монстр атакует в ответ и эти действия добавляются в массив истории
             } else if (actionType == 'specialAttack') {
                 let hitHard = userPoint + 10;
                 this.monsterScore -= hitHard;
-                this.historyActions.unshift({
-                    userAction: `Player hit hard the monster for ${hitHard}`,
-                    monsterAction: `Monster hit the player for ${monsterPoint}`
-                });
+                this.addAction('Player hit hard the monster for ', hitHard, true);
+                this.monsterHit();
                 // Если пользователь лечит себя, но при этом монстр не перестанет атаковать и эти действия добавляются в массив истории
             } else if (actionType == 'heal') {
                 this.userScore += userPoint;
                 if (this.userScore > 100) {
                     this.userScore = 100;
                 }
-                this.historyActions.unshift({
-                    userAction: `Player heals himself for ${userPoint}`,
-                    monsterAction: `Monster hit the player for ${monsterPoint}`
-                });
+                this.addAction('Player heals himself for ', userPoint, true);
+                this.monsterHit();
             }
             // Каждый раз при действии пользователя проверяем выиграл ли кто-то или нет
             this.returnWinner();
+            console.log(this.historyActions);
         },
         // Когда пользователь сдается, то приостанавливаем игру
         giveUp: function () {
             this.startedNewGame = false;
+        },
+        // Функция атаки монстра
+        monsterHit: function () {
+            let monsterPoint = this.randomNumber();
+            this.userScore -= monsterPoint;
+            this.addAction('Monster hit the player for ', monsterPoint, false);
+        },
+        // Функция добавления действий в общий массив
+        addAction: function (actionText, actionPoint, isPlayer) {
+            this.historyActions.unshift({
+                text: actionText + actionPoint,
+                isPlayer: isPlayer
+            });
         },
         // Функция, которая проверяет выиграл ли кто-то или нет, если выиграл, то спрашивает продолжать или нет. В зависимости от ответа либо создается новая игра, либо пользователь сдается и игра приостанавливается 
         returnWinner: function () {
