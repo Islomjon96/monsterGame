@@ -78,6 +78,10 @@ button {
     background-color: #ff9a2b;
 }
 
+#special-attack.disabled {
+    background-color: lightgray;
+}
+
 #heal {
     background-color: #aaffb0;
 }
